@@ -41,7 +41,17 @@ pipeline {
             }
         }
         
-        stage('4. Package') {
+        stage('4. SonarQube Analysis') {
+            steps {
+                echo 'Running SonarQube code analysis...'
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+                echo 'SonarQube scan complete. Check dashboard for results.'
+            }
+        }
+        
+        stage('5. Package') {
             steps {
                 echo 'Creating WAR file...'
                 sh 'mvn package -DskipTests'
@@ -53,6 +63,7 @@ pipeline {
     post {
         success {
             echo "✅ Pipeline SUCCESS"
+            echo "View SonarQube results at: http://<EC2-IP>:9000"
         }
         failure {
             echo "❌ Pipeline FAILED"
