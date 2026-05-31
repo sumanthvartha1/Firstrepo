@@ -54,7 +54,15 @@ pipeline {
                         }
                     }
                 }
-                
+                // Temporarily disabled - NVD API requires key
+        // stage('4b. OWASP Dependency Check SCA') {
+        //     steps {
+        //         echo 'Scanning dependencies for vulnerabilities...'
+        //         sh 'mvn dependency-check:check'
+        //     }
+        // }
+    }
+}
                 stage('4b. OWASP Dependency Check SCA') {
                     steps {
                         echo 'Scanning dependencies for vulnerabilities...'
