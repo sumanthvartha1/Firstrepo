@@ -62,16 +62,17 @@
             
             <!-- OWASP Dependency Check -->
             <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>8.4.0</version>
-                <configuration>
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    
+    <groupId>org.owasp</groupId>
+    <artifactId>dependency-check-maven</artifactId>
+    <version>8.4.0</version>
+    <configuration>
+        <failBuildOnCVSS>7</failBuildOnCVSS>
+        <skipTestScope>false</skipTestScope>
+        <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
+        <autoUpdate>false</autoUpdate>
+    </configuration>
+</plugin>
+              
     <!-- NEXUS CONFIGURATION -->
     <distributionManagement>
         <repository>
