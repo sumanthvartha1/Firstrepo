@@ -41,21 +41,48 @@ pipeline {
             }
         }
         
-        stage('4. SonarQube Analysis') {
-            steps {
-                echo 'Running SonarQube code analysis...'
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
+        stage('4. Parallel Security Scans') {
+            parallel {
+                stage('4a. SonarQube SAST') {
+                    steps {
+                        echo 'Running SonarQube code analysis...'
+                        withSonarQubeEnv('SonarQube') {
+                            sh 'mvn sonar:sonar'
+                        }
+                        echo 'SonarQube scan complete.'
+                    }
                 }
-                echo 'SonarQube scan complete. Check dashboard for results.'
+                
+                stage('4b. OWASP Dependency Check') {
+                    steps {
+                        echo 'Scanning dependencies for vulnerabilities...'
+                        sh 'mvn dependency-check:check'
+                        echo 'OWASP scan complete.'
+                    }
+                    post {
+                        always {
+                            dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+                        }
+                    }
+                }
             }
         }
         
-        stage('5. Package') {
+        stage('5. Quality Gate') {
+            steps {
+                echo 'Waiting for SonarQube Quality Gate result...'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+                echo '✅ Quality Gate: PASSED'
+            }
+        }
+        
+        stage('6. Package') {
             steps {
                 echo 'Creating WAR file...'
                 sh 'mvn package -DskipTests'
-                echo 'Build complete!'
+                echo 'Artifact ready: target/payment-service-1.0.0.war'
             }
         }
     }
@@ -63,7 +90,6 @@ pipeline {
     post {
         success {
             echo "✅ Pipeline SUCCESS"
-            echo "View SonarQube results at: http://<EC2-IP>:9000"
         }
         failure {
             echo "❌ Pipeline FAILED"
