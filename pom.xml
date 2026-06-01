@@ -20,7 +20,6 @@
     </properties>
     
     <dependencies>
-        <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -28,7 +27,6 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- JUnit for testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -39,41 +37,36 @@
     
     <build>
         <plugins>
-            <!-- Compiler plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
             </plugin>
             
-            <!-- Surefire for tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
             </plugin>
             
-            <!-- WAR plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
             </plugin>
             
-            <!-- OWASP Dependency Check -->
             <plugin>
-    <groupId>org.owasp</groupId>
-    <artifactId>dependency-check-maven</artifactId>
-    <version>8.4.0</version>
-    <configuration>
-        <failBuildOnCVSS>7</failBuildOnCVSS>
-        <skipTestScope>false</skipTestScope>
-        <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
-        <autoUpdate>false</autoUpdate>
-    </configuration>
-</plugin>
-              
-    <!-- NEXUS CONFIGURATION -->
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>8.4.0</version>
+                <configuration>
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <autoUpdate>false</autoUpdate>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
     <distributionManagement>
         <repository>
             <id>nexus-releases</id>
@@ -86,3 +79,4 @@
     </distributionManagement>
     
 </project>
+
