@@ -53,16 +53,16 @@ pipeline {
                     }
                 }
                 
-                stage('4b. OWASP Dependency Check') {
+                stage('4b. Trivy SCA Scan') {
                     steps {
-                        echo 'Scanning dependencies for vulnerabilities...'
-                        sh 'mvn dependency-check:check'
-                        echo 'OWASP scan complete.'
-                    }
-                    post {
-                        always {
-                            dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-                        }
+                        echo 'Scanning dependencies with Trivy...'
+                        sh '''
+                            trivy fs --severity HIGH,CRITICAL \
+                              --format table \
+                              --exit-code 1 \
+                              pom.xml
+                        '''
+                        echo 'Trivy scan complete - no critical vulnerabilities found'
                     }
                 }
             }
@@ -89,10 +89,10 @@ pipeline {
     
     post {
         success {
-            echo "✅ Pipeline SUCCESS"
+            echo "✅ Pipeline SUCCESS: All security scans passed"
         }
         failure {
-            echo "❌ Pipeline FAILED"
+            echo "❌ Pipeline FAILED: Security issues found"
         }
     }
 }
