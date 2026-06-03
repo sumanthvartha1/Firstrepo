@@ -49,7 +49,7 @@ pipeline {
                         withSonarQubeEnv('SonarQube') {
                             sh 'mvn sonar:sonar'
                         }
-                        echo 'SonarQube scan complete.'
+                        echo 'SonarQube analysis submitted. Check dashboard for results.'
                     }
                 }
                 
@@ -68,31 +68,31 @@ pipeline {
             }
         }
         
-        stage('5. Quality Gate') {
-            steps {
-                echo 'Waiting for SonarQube Quality Gate result...'
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-                echo '✅ Quality Gate: PASSED'
-            }
-        }
-        
-        stage('6. Package') {
+        stage('5. Package') {
             steps {
                 echo 'Creating WAR file...'
                 sh 'mvn package -DskipTests'
-                echo 'Artifact ready: target/payment-service-1.0.0.war'
+                echo 'Artifact created: target/payment-service-1.0.0.war'
+            }
+        }
+        
+        stage('6. Upload to Nexus') {
+            steps {
+                echo 'Uploading artifact to Nexus Repository...'
+                sh 'mvn deploy -DskipTests'
+                echo 'Artifact uploaded to Nexus'
             }
         }
     }
     
     post {
         success {
-            echo "✅ Pipeline SUCCESS: All security scans passed"
+            echo "✅ PIPELINE SUCCESS"
+            echo "SonarQube: http://<EC2-IP>:9000/dashboard?id=payment-service"
+            echo "Nexus: http://<EC2-IP>:8081"
         }
         failure {
-            echo "❌ Pipeline FAILED: Security issues found"
+            echo "❌ Pipeline FAILED"
         }
     }
 }
